@@ -55,6 +55,8 @@ def is_valid_field(field: str, value: str):
         return value in ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
     elif field == "pid":
         return re.fullmatch("\d{9}", value) is not None
+    elif field == "cid":
+        return True
     else:
         return False
 
