@@ -2,79 +2,66 @@ import os
 import re
 
 
-def parse_passport(passport: list):
-    passport = passport.replace("\n", " ").rsplit(" ")
+def parse_passport(passport: str):
+    passport = passport.strip().replace("\n", " ").split(" ")
     passport_dict = {}
+
     for field in passport:
-        (field_key, _, field_value) = field.partition(":")
+        field_key, field_value = field.split(":")
         passport_dict[field_key] = field_value
     return passport_dict
 
 
 def is_valid_passport(passport: dict):
     required_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-    if all(field in passport.keys() for field in required_fields):
-        return True
-    return False
+    return all(field in passport.keys() for field in required_fields)
 
 
-def validate(input):
-    valid = 0
-    for passport in input:
-        pp = parse_passport(passport)
-        if is_valid_passport(pp):
-            valid += 1
-    return valid
+def validate(input_):
+    return sum(is_valid_passport(parse_passport(passport)) for passport in input_)
 
 
 def is_valid_passport_2(passport: dict):
-    required_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-    if all(field in passport.keys() for field in required_fields):
-        return all(is_valid_field(field, passport[field]) for field in passport.keys())
-    return False
+    return is_valid_passport(passport) and all(
+        is_valid_field(field, passport[field]) for field in passport.keys()
+    )
 
 
 def is_valid_field(field: str, value: str):
     if field == "byr":
-        return int(value) >= 1920 and int(value) <= 2002
+        return 1920 <= int(value) <= 2002
     elif field == "iyr":
-        return int(value) >= 2010 and int(value) <= 2020
+        return 2010 <= int(value) <= 2020
     elif field == "eyr":
-        return int(value) >= 2020 and int(value) <= 2030
+        return 2020 <= int(value) <= 2030
     elif field == "hgt":
-        m = re.search("(\d+)(\w+)", value)
-        if m.group(2) == "cm":
-            return int(m.group(1)) >= 150 and int(m.group(1)) <= 193
-        elif m.group(2) == "in":
-            return int(m.group(1)) >= 59 and int(m.group(1)) <= 76
-        else:
-            return False
+        height, unit = re.search(r"(\d+)(\w+)", value).groups()
+        return (
+            unit == "cm"
+            and 150 <= int(height) <= 193
+            or unit == "in"
+            and 59 <= int(height) <= 76
+        )
     elif field == "hcl":
-        return re.fullmatch("#[0-9a-f]{6}", value) is not None
+        return bool(re.fullmatch(r"#[0-9a-f]{6}", value))
     elif field == "ecl":
         return value in ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
     elif field == "pid":
-        return re.fullmatch("\d{9}", value) is not None
+        return bool(re.fullmatch(r"\d{9}", value))
     elif field == "cid":
         return True
     else:
         return False
 
 
-def validate_2(input):
-    valid = 0
-    for passport in input:
-        pp = parse_passport(passport)
-        if is_valid_passport_2(pp):
-            valid += 1
-    return valid
+def validate_2(input_):
+    return sum(is_valid_passport_2(parse_passport(passport)) for passport in input_)
 
 
 def test():
     input = (
         open(os.path.join(os.path.dirname(__file__), "input_test.txt"))
         .read()
-        .strip()
         .split("\n\n")
     )
     assert validate(input) == 2
@@ -83,10 +70,7 @@ def test():
 if __name__ == "__main__":
     test()
     input = (
-        open(os.path.join(os.path.dirname(__file__), "input.txt"))
-        .read()
-        .strip()
-        .split("\n\n")
+        open(os.path.join(os.path.dirname(__file__), "input.txt")).read().split("\n\n")
     )
     print(f"Part 1: {validate(input)}")
     print(f"Part 2: {validate_2(input)}")
