@@ -74,6 +74,7 @@ def test():
     input = (
         open(os.path.join(os.path.dirname(__file__), "input_test.txt"))
         .read()
+        .strip()
         .split("\n\n")
     )
     assert validate(input) == 2
@@ -82,7 +83,10 @@ def test():
 if __name__ == "__main__":
     test()
     input = (
-        open(os.path.join(os.path.dirname(__file__), "input.txt")).read().split("\n\n")
+        open(os.path.join(os.path.dirname(__file__), "input.txt"))
+        .read()
+        .strip()
+        .split("\n\n")
     )
     print(f"Part 1: {validate(input)}")
     print(f"Part 2: {validate_2(input)}")
