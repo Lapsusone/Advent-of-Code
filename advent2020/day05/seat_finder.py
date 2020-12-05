@@ -25,17 +25,17 @@ def find_column(column_descriptor: str) -> int:
     return int(column_descriptor.replace("R", "1").replace("L", "0"), 2)
 
 
-def find_highest_seat_id(input: list) -> int:
+def find_highest_seat_id(input_: list) -> int:
     max_seat_id = 0
-    for boarding_pass in input:
+    for boarding_pass in input_:
         seat_id = get_seat_id(boarding_pass)
         if seat_id > max_seat_id:
             max_seat_id = seat_id
     return max_seat_id
 
 
-def find_my_seat_id(input: list) -> int:
-    seats_sequence = sorted(get_seat_id(b_pass) for b_pass in input)
+def find_my_seat_id(input_: list) -> int:
+    seats_sequence = sorted(get_seat_id(b_pass) for b_pass in input_)
     for i, seat in enumerate(seats_sequence):
         if seats_sequence[i + 1] != seat + 1:
             return seat + 1
